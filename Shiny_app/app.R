@@ -71,13 +71,6 @@ myDirectory <- setPaths(FALSE)
 ################################################################################
 
 ####### Load results of DEseq2 analysis to be displayed in Shiny app ###########
-## The function read_count_matrix() returns a count matrix dataframe with a new
-## added 'neg_log10_padj' column. This function expects a RNAseq count matrix
-## data file in .tsv format derived from a DESeq2 analysis. The input file must
-## have the following columns: `Gene`, `geneName`, `baseMean`, `log2FoldChange`,
-## `pvalue`, `padj`, and at least 2 columns of normalized counts. The headers of
-## the columns of the normalized counts must have some similar characters
-## Example: df <- read_count_matrix(paste0(myDirectory, "results_file.rds"))
 
 read_count_matrix <- function(dds_df) {
         dds_df <- readRDS(dds_df) %>% as_tibble() %>% 
@@ -98,12 +91,12 @@ pca_1 <- (paste0(myDirectory, "pca_1.png"))
 pca_2 <- (paste0(myDirectory, "pca_2.png"))
 
 ## saved limma::goana GO results
-go_1 <- readRDS(paste0(myDirectory, "go_1.rds")) %>% arrange(P.DE) # %>% arrange(P.ADJ.DE)
-go_2 <- readRDS(paste0(myDirectory, "go_2.rds")) %>% arrange(P.DE) # %>% arrange(P.ADJ.DE)
+go_1 <- readRDS(paste0(myDirectory, "go_1.rds")) %>% arrange(P.DE)
+go_2 <- readRDS(paste0(myDirectory, "go_2.rds")) %>% arrange(P.DE)
 
 ## saved limma::kegga GO results
-kegg_1 <- readRDS(paste0(myDirectory, "kegg_1.rds")) %>% arrange(P.DE) # %>% arrange(P.ADJ.DE)
-kegg_2 <- readRDS(paste0(myDirectory, "kegg_2.rds")) %>% arrange(P.DE) # %>% arrange(P.ADJ.DE)
+kegg_1 <- readRDS(paste0(myDirectory, "kegg_1.rds")) %>% arrange(P.DE)
+kegg_2 <- readRDS(paste0(myDirectory, "kegg_2.rds")) %>% arrange(P.DE)
 
 ###################### link results files as lists #############################
 list_1 <- list(dds_df_1, go_1, kegg_1, col_1, pca_1)
@@ -119,13 +112,15 @@ ui <- shinyUI(fluidPage(## title panel
               fluidRow(column(width = 12,
               ## first panel row 1
               fluidRow(column(width = 12,
-              h5("The following report describes an RNAseq differential expression (DE) analysis
-                 of count matrix files for the human and mouse sarcoma tissue as compared to control
-                 groups, using tools from the DESeq2 Bioconductor package. Specifically, this app
-                 displays the results of the inferred transcriptional changes between test groups
-                 and produces various diagnostic plots. Additionally, lists enriched gene of
-                 significantly expressed genes from this analysis are used to generate GO and
-                 KEGG enrichment."),
+              h5("This app displays RNAseq differential expression (DE) analysis
+                 of human and mouse sarcoma tissue versus healthy tissue groups.
+                 Specifically, this app displays, the experimental design (tab 1),
+                 the PCA plots for each comparison (tab 2), the results of the
+                 inferred transcriptional changes between test groups (using
+                 DESeq2 Bioconductor package) which include MA plots, volcano plots
+                 and gene-wise count plots for each comparion. Additionally, lists
+                 enriched genes (taken from the DE results) are used to generate GO term and
+                 KEGG pathway enrichment analyses."),
               h4("Experimental groups of selected DE comparison"),
               selectInput(inputId = "design",
                           label = "Please choose comparison",
@@ -384,19 +379,15 @@ server <- function(input, output) {
         head(1) %>% tidyr::gather(sample, counts, -c(Gene, geneName)) %>%
         mutate(group = substr(sample, 1, 2)) %>% 
         ggplot(aes(x = group, y = counts, color = group)) +
-        geom_point(size = 3) +
+        geom_jitter(size = 3) +
         ggtitle(selected_df1()[[1]][click_value_1(), ]$geneName)
     })
     
 ########################## Plot datatable experimental coldata #################
-    # output$table_1 <- DT::renderDataTable(col_1)
-    # input_00 <- reactive(get(input$design))
     input_00 <- reactive(selected_df4()[[4]])
     output$table_1 <- DT::renderDataTable(input_00())          
     
 ########################## Display saved PCA.png files #########################
-    # if multiple PCAs need to be displayed via a dropdown, this can be used
-    #image_1 <- reactive(get(input$pca))
     input_99 <- reactive(selected_df5()[[5]])
     output$image_1 <- renderImage({
         filename <- file.path(input_99())
@@ -408,8 +399,8 @@ server <- function(input, output) {
     input_3 <- reactive(selected_df1()[[1]])
     output$table_2 <- DT::renderDataTable(input_3() %>%
                       dplyr::select(-neg_log10_padj) %>%
-                      # mutate_at(3:5, round, 3) %>%
-                      # mutate_at(8:last_col(), round, 3) %>%
+                      mutate_at(4:7, round, 3) %>%
+                      # mutate_at(9:everything(), round, 3) %>%
                       arrange(padj), selection = 'single')
 
 ####################### Generate datatable GO results ##########################
