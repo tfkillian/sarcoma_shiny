@@ -7,4 +7,9 @@ How to run this app: open the `Shiny_app` folder and open the `app.R` in R and p
 
 Package requirements: DT, shiny, dplyr, tidyr, ggplot2
 
-* *GeneTonic viewer*: this app produces numerous plots, including GO enrichment and gene networks, but can only display the results from one DE comparison. *(currently under construction)*
+* *GeneTonic viewer*: this app produces numerous plots, including GO enrichment and gene networks, but can only display the results from one DE comparison. 
+
+How to run this app: open the `Genetonic_app` folder and open the `app.R` in R and press "Run" at the top of the window. For best viewing results, open in a web browser. Note, this app takes much longer to load,
+due to the complexity of the plots.
+
+Package requirements: GeneTonic, DESeq2, org.Mm.eg.db, AnnotationDbi, SummarizedExperiment, clusterProfiler, GO.db
