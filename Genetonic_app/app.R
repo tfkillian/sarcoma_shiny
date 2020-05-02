@@ -11,8 +11,11 @@ library("SummarizedExperiment")
 library("clusterProfiler")
 library("GO.db")
 
+# define your directory
+myDirectory <- "~/tmp/sarcoma_shiny"
+
 ## dds object (from raw mouse data)
-countdata <- read.csv("~/tmp/sarcoma_shiny/data/rms_sk_combo.csv",
+countdata <- read.csv(paste0(myDirectory, "/data/rms_sk_combo.csv"),
                       header = TRUE, row.names = 1)
 rownames(countdata) <- gsub("\\..*","", rownames(countdata))
 condition <- factor(c(rep("T0", 3), rep("T3", 4), rep("T5", 2), rep("KMR", 2)))
@@ -33,7 +36,7 @@ anno_df <- data.frame(
 )
 
 ## res object
-res_de <- readRDS("~/tmp/sarcoma_shiny/results/mouse_KMR_TO_res.rds")
+res_de <- readRDS(paste0(myDirectory, "/results/mouse_KMR_TO_res.rds"))
 rownames(res_de) <- gsub("\\..*","", rownames(res_de))
 
 ## convert res object to enrich_object
@@ -59,7 +62,7 @@ genes <- dataset$ENTREZID[dataset$padj <= padj_thr &
 res_GO <- enrichGO(gene          = genes,
                    universe      = names(geneList),
                    OrgDb         = org.Mm.eg.db,
-                   ont           = "BP",
+                   ont           = "BP", ### you can change this to another ontology
                    pAdjustMethod = "BH",
                    minGSSize     = 5,
                    maxGSSize     = 500,
@@ -67,16 +70,9 @@ res_GO <- enrichGO(gene          = genes,
                    qvalueCutoff  = 1,
                    readable      = TRUE)
 
-# res_enrich <- shake_topGOtableResult(res_GO@result, p_value_column = "p.adjust")
 res_enrich <- shake_enrichResult(res_GO)
 
-## res_enrich object
-#data(res_enrich_macrophage, package = "GeneTonic")
-# res_enrich <- shake_topGOtableResult(topgoDE_macrophage_IFNg_vs_naive)
-# 
-# res_enrich <- readRDS("~/tmp/sarcoma_shiny/results/go_2.rds")
-# res_enrich <- shake_topGOtableResult(res_enrich, p_value_column = "ADJ.P.DE")
-
+## this part runs the app
 GeneTonic(dds = dds_1, ## dds object (SummarizedExperiment)
           res_de = res_de, ## results object
           res_enrich = res_enrich, ## enriched GO object
