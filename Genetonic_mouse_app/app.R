@@ -14,10 +14,10 @@ library("GO.db")
 myDirectory <- "~/tmp/sarcoma_shiny"
 
 ## load data
-dds_1 <- readRDS(paste0(myDirectory, "/results/dds_1.rds"))
-anno_df <- readRDS(paste0(myDirectory, "/results/anno_df.rds"))
-res_de <- readRDS(paste0(myDirectory, "/results/res_de.rds"))
-res_enrich <- readRDS(paste0(myDirectory, "/results/res_enrich.rds"))
+dds_1 <- readRDS(paste0(myDirectory, "/results/dds_2.rds"))
+anno_df <- readRDS(paste0(myDirectory, "/results/anno_df_2.rds"))
+res_de <- readRDS(paste0(myDirectory, "/results/res_de_2.rds"))
+res_enrich <- readRDS(paste0(myDirectory, "/results/res_enrich_2.rds"))
 
 ## this part runs the app
 GeneTonic(dds = dds_1, ## dds object (SummarizedExperiment)
