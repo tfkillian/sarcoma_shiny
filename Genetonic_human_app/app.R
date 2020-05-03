@@ -1,4 +1,4 @@
-## genetonic app with mouse data
+## genetonic app with human data
 
 # BiocManager::install("GeneTonic")
 
